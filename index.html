@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<HTML>
+<HEAD>
+	<TITLE>Timing</TITLE>
+	<link type="text/css" rel="stylesheet" href="./index.css" />
+</HEAD>
+<BODY background-color="red" onload="mainLoop()">
+	<div id="Clock" class="Main">
+		<h1>Current Time</h1>
+		<h1 id="CurrentTime">
+		</h1>
+	</div>
+	<div id="A_Option" class="Main">
+		<ul id="AO_Menu" class="HorizontalMenu">
+			<li onclick="DStopWatch()">
+				<div class="Button" id="AOM_Watch" >StopWatch</div>
+			</li>
+			<li onclick="DAlarm()">
+				<div class="Button" id="AOM_Alarm">Alarm</div>
+			</li>
+			<li onclick="DCountDown()">
+				<div class="Button" id="AOM_CountDown">CountDown</div>
+			</li>
+		</ul>
+	</div>
+	<div id="App" class="Main">
+		<ul id="App_Menu" class="HorizontalMenu">
+			<li id="Start" onclick="StartWatch()">
+				<div class="Button StartButton">Start</div>
+			</li>
+			<li id="Stop" onclick="StopWatch()">
+				<div class="Button StopButton">Stop</div>
+			</li>
+			<li id="Clear" onclick="ClearWatch()">
+				<div class="Button ClearButton">Clear</div>
+			</li>
+		</ul>
+		<div id="AP_StopWatch">
+			<div id="APSW_Display">
+				<p id="APSWD_Text"></p>
+			</div>
+		</div>
+		<div id="AP_Alarm">
+			<div id="APA_Menu">
+				<ul class = "HorizontalMenu">
+					<li>
+						<img src="IncArrow.png" id="APA_Hour" class="IncButton" onclick="IncAlarmHour()"></img>
+					</li>
+					<li>
+						<img src="IncArrow.png" id="APA_Minute" class="IncButton" onclick="IncAlarmMinute()"></img>
+					</li>
+					<li>
+						<img src="IncArrow.png" id="APA_Second" class="IncButton" onclick="IncAlarmSecond()"></img>
+					</li>
+				</ul>
+				<ul id="APA_Container">
+					<div id="APA_Display">
+						<div>
+							<p id="APAC_HourText"></p>
+						</div>
+						<div>
+							<p id="APAC_MinuteText"></p>
+						</div>
+						<div>
+							<p id="APAC_SecondText"></p>
+						</div>
+					</div>
+				</ul>
+				<ul class = "HorizontalMenu">
+					<li>
+						<img src="DecArrow.png" id="APACHDe_Hour" class="DecButton" onclick="DecAlarmHour()"></img src="DecArrow.png">
+					</li>
+					<li>
+						<img src="DecArrow.png" id="APACHDe_Minute" class="DecButton" onclick="DecAlarmMinute()"></img src="DecArrow.png">
+					</li>
+					<li>
+						<img src="DecArrow.png" id="APACHDe_Second" class="DecButton" onclick="DecAlarmSecond()"></img src="DecArrow.png">
+					</li>
+				</ul>
+			</div>
+			<div id="APAT_Display">
+				<p>Time Until:</p>
+				<p id="APAT_Text">0</p>
+			</div>
+		</div>
+		<div id="AP_CountDown">
+			<div id="APCD_Menu">
+				<ul class = "HorizontalMenu">
+					<li>
+						<img src="IncArrow.png" id="APCDI_Hour" class="IncButton" onclick="IncCountDownHour()"></img>
+					</li>
+					<li>
+						<img src="IncArrow.png" id="APCDI_Minute" class="IncButton" onclick="IncCountDownMinute()"></img>
+					</li>
+					<li>
+						<img src="IncArrow.png" id="APCDI_Second" class="IncButton" onclick="IncCountDownSecond()"></img>
+					</li>
+				</ul>
+				<ul id="APCD_Container">
+					<div id="APCD_Display">
+						<div id="APCD_Hour">
+							<p id="APCD_HourText"></p>
+						</div>
+						<div id="APCD_Minute">
+							<p id="APCD_MinuteText"></p>
+						</div>
+						<div id="APCD_Second">
+							<p id="APCD_SecondText"></p>
+						</div>
+						
+					</div>
+				</ul>
+				<ul class = "HorizontalMenu">
+					<li>
+						<img src="DecArrow.png" id="APACHDe_Hour" class="DecButton" onclick="DecCountDownHour()"></img src="DecArrow.png">
+					</li>
+					<li>
+						<img src="DecArrow.png" id="APACHDe_Minute" class="DecButton" onclick="DecCountDownMinute()"></img src="DecArrow.png">
+					</li>
+					<li>
+						<img src="DecArrow.png" id="APACHDe_Second" class="DecButton" onclick="DecCountDownSecond()"></img src="DecArrow.png">
+					</li>
+				</ul>
+			</div>
+			<div id="APCDT_Display">
+				<p>Time Remaning:</p>
+				<p id="APCDT_Text">0</p>
+			</div>
+		</div>
+	</div>
+	<script src="./time.js"></script>
+</BODY>
+</HTML>
