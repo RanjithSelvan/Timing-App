@@ -1,101 +1,84 @@
-var oH = 0;
-var oM = 0;
-var oS = 0;
-var nH = 0;
-var nM = 0;
-var nS = 0;
-var timeElapsed = [[0,0,0],[0,0,0],[0,0,0]];
-var AMPM = "";
 var active = [0,0,0];	//0:StopWatch; 1:Alarm; 2:CountDown
 var mode = 0;		//0:StopWatch; 1:Alarm; 2:CountDown
 
+var lastTime;
+var currentTime;
+var deltaTime;
+
+var stopWatchTime = 0;
+var alarmTime = {
+	hour : 0,
+	minute : 0,
+	second : 0,
+};
+var countDownTime = {
+	hour : 0,
+	minute : 0,
+	second : 0,
+};
+
 function mainLoop() {
-	var today = new Date();
-	nH = today.getHours();
-	nM = today.getMinutes();
-	nS = today.getSeconds();
 	
-	if( nH > 12){
-		nH = nH -12;
+	//Current Time
+	currentTime = new Date();
+	deltaTime = currentTime - lastTime;
+	lastTime = currentTime;
+	var hour = currentTime.getHours();
+	var minute = currentTime.getMinutes();
+	var second = currentTime.getSeconds();
+	var AMPM = "";
+	
+	if( hour > 12){
+		hour = hour -12;
 		AMPM = "PM";
 	}
-	if( nH == 0){
-		nH = nH + 12;
+	if( hour == 0){
+		hour = hour + 12;
 		AMPM = "AM";
 	}
+	document.getElementById('CurrentTime').innerHTML = checkTime(hour) + ":" + checkTime(minute) + ":" + checkTime(second) + " " + AMPM;
+	
 	//Stop Watch
 	if(active[0] == 1){
-		if(oS > nS){
-			timeElapsed[0][2] += 60 - parseInt(oS) + parseInt(nS);
-			oS = nS;
-		}
-		else{
-			timeElapsed[0][2] += nS - oS;
-			oS = nS;
-		}
-		if(timeElapsed[0][2] >= 60){
-			timeElapsed[0][1] += Math.floor(timeElapsed[0][2]/60);
-			timeElapsed[0][2] = timeElapsed[0][2]%60;
-		}
-		if(timeElapsed[0][1] >= 60){
-			timeElapsed[0][0] += Math.floor(timeElapsed[0][1]/60);
-			timeElapsed[0][1] = timeElapsed[0][1]%60;
-		}
+		stopWatchTime += deltaTime;
+		var timeCount = Math.floor(stopWatchTime/1000);
+		var hours = Math.floor(timeCount/3600);
+		var minutes = Math.floor((timeCount-(hours*3600))/60);
+		var seconds = Math.floor((timeCount-(hours*3600)-(minutes*60)));
+		document.getElementById('APSWD_Text').innerHTML = hours + ":" + checkTime(minutes) + ":" + checkTime(seconds);
 	}
 	//Alarm
 	if(active[1] == 1){
-		if(timeElapsed[1][0] == nH && timeElapsed[1][1] == nM && timeElapsed[1][2] == nS){
-			alert("Its Time!");
+		if(alarmTime.hour == hour && alarmTime.minute == minute && alarmTime.second == second){
 			var remMode = mode;
+			alert("Its Time!");
 			mode = 1;
+			active[1] = 0;
 			ClearWatch();
 			mode = remMode;
 		}
 		else{
-			var tS = 0, tM = 0, tH = 0;
-			if( timeElapsed[1][2] < nS){
-				tM -= 1;
-				tS = 60 - nS + timeElapsed[1][2];
-			}
-			else{
-				tS += timeElapsed[1][2] - nS;
-			}
-			if( timeElapsed[1][1] < nM){
-				tH -= 1;
-				tM += 60 - nM + timeElapsed[1][1];
-			}
-			else{
-				tM += timeElapsed[1][1] - nM;
-			}
-			tH += timeElapsed[1][0] - nH;
-			document.getElementById('APAT_Text').innerHTML = checkTime(tH) + ":" + checkTime(tM) + ":" + checkTime(tS);
+			var timeCount = ( (alarmTime.hour*3600) + (alarmTime.minute*60) + (alarmTime.second) ) - ( (hour*3600) + (minute*60) + (second) );
+			var hours = Math.floor(timeCount/3600);
+			var minutes = Math.floor((timeCount-(hours*3600))/60);
+			var seconds = Math.floor((timeCount-(hours*3600)-(minutes*60)));
+			document.getElementById('APAT_Text').innerHTML = checkTime(hours) + ":" + checkTime(minutes) + ":" + checkTime(seconds);
 		}
 	}
 	//CountDown
 	if(active[2] == 1){
-		if(timeElapsed[2][0] == 0 && timeElapsed[2][1] == 0 && timeElapsed[2][2] == 0){
-			//alert("Its Time!");
-		}
-		// else{
-			// var tS = 0, tM = 0, tH = 0;
-			// if( timeElapsed[2][2] < 59){
-				// tS = timeElapsed[2][2] - ( nS - oS )
-			// }
-			// else{
-				
-			// }
-			// document.getElementById('APCDT_Text').innerHTML = checkTime(tH) + ":" + checkTime(tM) + ":" + checkTime(tS);
-		// }
+		document.getElementById('APCDT_Text').innerHTML = checkTime(countDownTime.hour) + ":" + checkTime(countDownTime.minute) + ":" + checkTime(countDownTime.second);
 	}
 	
-	document.getElementById('CurrentTime').innerHTML = checkTime(nH) + ":" + checkTime(nM) + ":" + checkTime(nS) + " " + AMPM;
-	document.getElementById('APSWD_Text').innerHTML = timeElapsed[0][0] + ":" + checkTime(timeElapsed[0][1]) + ":" + checkTime(timeElapsed[0][2]);
-	document.getElementById("APAC_HourText").innerHTML = checkTime(timeElapsed[1][0]);
-	document.getElementById("APAC_MinuteText").innerHTML = checkTime(timeElapsed[1][1]);
-	document.getElementById("APAC_SecondText").innerHTML =  checkTime(timeElapsed[1][2]);
-	document.getElementById("APCD_HourText").innerHTML = checkTime(timeElapsed[2][0]);
-	document.getElementById("APCD_MinuteText").innerHTML = checkTime(timeElapsed[2][1]);
-	document.getElementById("APCD_SecondText").innerHTML =  checkTime(timeElapsed[2][2]);
+	//Alarm Display
+	document.getElementById("APAC_HourText").innerHTML = checkTime(alarmTime.hour);
+	document.getElementById("APAC_MinuteText").innerHTML = checkTime(alarmTime.minute);
+	document.getElementById("APAC_SecondText").innerHTML =  checkTime(alarmTime.second);
+	//CountDown Display
+	document.getElementById("APCD_HourText").innerHTML = checkTime(countDownTime.hour);
+	document.getElementById("APCD_MinuteText").innerHTML = checkTime(countDownTime.minute);
+	document.getElementById("APCD_SecondText").innerHTML =  checkTime(countDownTime.second);
+	
 	requestAnimationFrame(mainLoop);
 }
 
@@ -147,12 +130,11 @@ function DCountDown(){
 
 function StartWatch(){
 	switch(mode){
-		case 0:	
-			oH = nH;
-			oM = nM;
-			oS = nS;
+		// StopWatch
+		case 0:
 			active[0] = 1;
 			break;
+		//Alarm
 		case 1:
 			document.getElementById('Start').style.display = "none"
 			document.getElementById('Clear').style.display = "inline";
@@ -160,10 +142,8 @@ function StartWatch(){
 			document.getElementById('APAT_Display').hidden = false;
 			active[1] = 1;
 			break;
+		//CountDown
 		case 2:
-			oH = nH;
-			oM = nM;
-			oS = nS;
 			document.getElementById('APCD_Menu').hidden = true;
 			document.getElementById('APCDT_Display').hidden = false;
 			active[2] = 1;
@@ -172,11 +152,14 @@ function StartWatch(){
 }
 function StopWatch(){
 	switch(mode){
+		//StopWatch
 		case 0:
 			active[0] = 0;
 			break;
+		//Alarm
 		case 1:
 			break;
+		//CountDown
 		case 2:
 			active[2] = 0;
 			break;
@@ -184,23 +167,29 @@ function StopWatch(){
 }
 function ClearWatch(){
 	switch(mode){
+		//StopWatch
 		case 0:
-			timeElapsed[0] = [0,0,0];
 			active[0] = 0;
 			break;
+		//Alarm
 		case 1:
 			document.getElementById('Start').style.display = "inline"
 			document.getElementById('Clear').style.display = "none";
 			document.getElementById('APA_Menu').hidden = false;
 			document.getElementById('APAT_Display').hidden = true;
-			timeElapsed[1] = [0,0,0];
+			alarmTime.hour = 0;
+			alarmTime.minute = 0;
+			alarmTime.second = 0;
 			active[1] = 0;
 			document.getElementById('APAT_Text').innerHTML = checkTime(0) + ":" + checkTime(0) + ":" + checkTime(0);
 			break;
+		//CountDown
 		case 2:
 			document.getElementById('APCD_Menu').hidden = false;
 			document.getElementById('APCDT_Display').hidden = true;
-			timeElapsed[2] = [0,0,0];
+			countDownTime.hour = 0;
+			countDownTime.minute = 0;
+			countDownTime.second = 0;
 			active[2] = 0;
 			break;
 	}	
@@ -208,100 +197,100 @@ function ClearWatch(){
 
 
 function IncAlarmHour(){
-	if( timeElapsed[1][0] < 12){
-		timeElapsed[1][0] += 1;
+	if( alarmTime.hour < 12){
+		alarmTime.hour += 1;
 	}
 	else{
-		timeElapsed[1][0] = 0;
+		alarmTime.hour = 0;
 	}
 }
 function IncAlarmMinute(){
-	if( timeElapsed[1][1] < 59){
-		timeElapsed[1][1] += 1;
+	if( alarmTime.minute < 59){
+		alarmTime.minute += 1;
 	}
 	else{
-		timeElapsed[1][1] = 0;
+		alarmTime.minute = 0;
 	}
 }
 function IncAlarmSecond(){
-	if( timeElapsed[1][2] < 59){
-		timeElapsed[1][2] += 1;
+	if( alarmTime.second < 59){
+		alarmTime.second += 1;
 	}
 	else{
-		timeElapsed[1][2] = 0;
+		alarmTime.second = 0;
 	}
 }
 function DecAlarmHour(){
-	if(timeElapsed[1][0] > 0){
-		timeElapsed[1][0] -= 1;
+	if(alarmTime.hour > 0){
+		alarmTime.hour -= 1;
 	}
 	else{
-		timeElapsed[1][0] = 12;
+		alarmTime.hour = 12;
 	}
 }
 function DecAlarmMinute(){
-	if(timeElapsed[1][1] > 0){
-		timeElapsed[1][1] -= 1;
+	if( alarmTime.minute > 0){
+		alarmTime.minute -= 1;
 	}
 	else{
-		timeElapsed[1][1] = 59;
+		alarmTime.minute = 59;
 	}
 }
 function DecAlarmSecond(){
-	if(timeElapsed[1][2] > 0){
-		timeElapsed[1][2] -= 1;
+	if( alarmTime.second > 0){
+		alarmTime.second -= 1;
 	}
 	else{
-		timeElapsed[1][2] = 59;
+		alarmTime.second = 59;
 	}
 }
 
 function IncCountDownHour(){
-	if( timeElapsed[2][0] < 99){
-		timeElapsed[2][0] += 1;
+	if( countDownTime.hour < 99){
+		countDownTime.hour += 1;
 	}
 	else{
-		timeElapsed[2][0] = 0;
+		countDownTime.hour = 0;
 	}
 }
 function IncCountDownMinute(){
-	if( timeElapsed[2][1] < 59){
-		timeElapsed[2][1] += 1;
+	if( countDownTime.minute < 59){
+		countDownTime.minute += 1;
 	}
 	else{
-		timeElapsed[2][1] = 0;
+		countDownTime.minute = 0;
 	}
 }
 function IncCountDownSecond(){
-	if( timeElapsed[2][2] < 59){
-		timeElapsed[2][2] += 1;
+	if( countDownTime.second < 59){
+		countDownTime.second += 1;
 	}
 	else{
-		timeElapsed[2][2] = 0;
+		countDownTime.second = 0;
 	}
 }
 function DecCountDownHour(){
-	if(timeElapsed[2][0] > 0){
-		timeElapsed[2][0] -= 1;
+	if(countDownTime.hour > 0){
+		countDownTime.hour -= 1;
 	}
 	else{
-		timeElapsed[2][0] = 12;
+		countDownTime.hour = 12;
 	}
 }
 function DecCountDownMinute(){
-	if(timeElapsed[2][1] > 0){
-		timeElapsed[2][1] -= 1;
+	if(countDownTime.minute > 0){
+		countDownTime.minute -= 1;
 	}
 	else{
-		timeElapsed[2][1] = 59;
+		countDownTime.minute = 59;
 	}
 }
 function DecCountDownSecond(){
-	if(timeElapsed[2][2] > 0){
-		timeElapsed[2][2] -= 1;
+	if(countDownTime.second > 0){
+		countDownTime.second -= 1;
 	}
 	else{
-		timeElapsed[2][2] = 59;
+		countDownTime.second = 59;
 	}
 }
 
